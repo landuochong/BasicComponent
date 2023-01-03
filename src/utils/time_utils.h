@@ -1,5 +1,5 @@
-#ifndef RTCCORE_TIME_UTILS_H_
-#define RTCCORE_TIME_UTILS_H_
+#ifndef TIME_UTILS_H_
+#define TIME_UTILS_H_
 
 #include <stdint.h>
 #include <stdio.h>

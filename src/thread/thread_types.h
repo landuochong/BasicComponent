@@ -1,5 +1,5 @@
-#ifndef RTC_CORE_THREAD_TYPES_H_
-#define RTC_CORE_THREAD_TYPES_H_
+#ifndef THREAD_TYPES_H_
+#define THREAD_TYPES_H_
 
 // clang-format off
 // clang formating would change include order.
@@ -18,7 +18,7 @@
 #endif
 // clang-format on
 
-namespace cst_rtccore {
+namespace lego_comm {
 #if defined(WEBRTC_WIN)
 typedef DWORD PlatformThreadId;
 typedef DWORD PlatformThreadRef;

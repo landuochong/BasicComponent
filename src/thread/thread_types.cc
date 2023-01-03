@@ -15,7 +15,7 @@ typedef HRESULT(WINAPI* RTC_SetThreadDescription)(HANDLE hThread,
                                                   PCWSTR lpThreadDescription);
 #endif
 
-namespace cst_rtccore {
+namespace lego_comm {
 
 PlatformThreadId CurrentThreadId() {
 #if defined(WEBRTC_WIN)

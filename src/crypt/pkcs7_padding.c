@@ -1,8 +1,6 @@
 /*
  * pkcs7_padding.c
  *
- *  Created on: 2014-1-3
- *      Author: 叶润桂
  */
 
 #include <string.h>

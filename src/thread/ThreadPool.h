@@ -1,5 +1,5 @@
-#ifndef CORETHREAD_POOL_H
-#define CORETHREAD_POOL_H
+#ifndef THREAD_POOL_H
+#define THREAD_POOL_H
 #pragma once
 #include <vector>
 #include <queue>
@@ -12,9 +12,8 @@
 #include <functional>
 #include <stdexcept>
 #include "thread/thread_types.h"
-namespace cst_rtccore
-{
-    class CoreThreadPool {
+namespace lego_comm{
+    class ThreadPool {
     public:
         CoreThreadPool(std::string name,size_t);
         ~CoreThreadPool();

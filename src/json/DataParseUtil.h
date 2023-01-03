@@ -3,12 +3,12 @@
  * author: hongbin.wang
  * */
 #pragma once
-#ifndef COREDATAPARSEUTIL_H
-#define COREDATAPARSEUTIL_H
+#ifndef DATAPARSEUTIL_H
+#define DATAPARSEUTIL_H
 #include "json.hpp"
-namespace cst_rtccore
+namespace lego_comm
 {
-    class CoreDataParseUtil
+    class DataParseUtil
     {
     public:
        static nlohmann::json parseData(std::string data);

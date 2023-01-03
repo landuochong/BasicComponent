@@ -1,4 +1,4 @@
-#include "rtccore_time_utils.h"
+#include "time_utils.h"
 
 #include <stdint.h>
 #ifdef ANDROID
