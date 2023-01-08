@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "comm/crypt/ibase64.h"
+#include "crypt/ibase64.h"
 
 namespace Comm {
 

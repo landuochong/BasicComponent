@@ -5,7 +5,7 @@
 
 #include <string.h>
 
-#include "comm/assert/__assert.h"
+#include "assert/__assert.h"
 
 unsigned char pkcs7_padding_plus_len(unsigned int _datalen, unsigned char _blocksize)
 {

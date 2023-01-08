@@ -5,7 +5,7 @@
 #pragma once
 #ifndef DATAPARSEUTIL_H
 #define DATAPARSEUTIL_H
-#include "json.hpp"
+#include "json/json.h"
 namespace lego_comm
 {
     class DataParseUtil

@@ -3,29 +3,23 @@
 
 // clang-format off
 // clang formating would change include order.
-#if defined(WEBRTC_WIN)
+#if defined(WIN32) || defined(_WIN32)
 #include <winsock2.h>
 #include <windows.h>
-#elif defined(WEBRTC_FUCHSIA)
-#include <zircon/types.h>
-#include <zircon/process.h>
-#elif defined(WEBRTC_POSIX)
+#elif defined(ANDROID) || defined(__APPLE__)
 #include <pthread.h>
 #include <unistd.h>
-#if defined(WEBRTC_MAC)
+#if defined(_MAC)
 #include <pthread_spis.h>
 #endif
 #endif
 // clang-format on
 
 namespace lego_comm {
-#if defined(WEBRTC_WIN)
+#if defined(WIN32)
 typedef DWORD PlatformThreadId;
 typedef DWORD PlatformThreadRef;
-#elif defined(WEBRTC_FUCHSIA)
-typedef zx_handle_t PlatformThreadId;
-typedef zx_handle_t PlatformThreadRef;
-#elif defined(WEBRTC_POSIX)
+#elif defined(ANDROID) || defined(__APPLE__)
 typedef pid_t PlatformThreadId;
 typedef pthread_t PlatformThreadRef;
 #endif

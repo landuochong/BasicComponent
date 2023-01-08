@@ -1,12 +1,16 @@
 #include "thread/thread_types.h"
 
-#if defined(WEBRTC_LINUX)
+#if defined(ANDROID) || defined(__APPLE__)
 #include <sys/prctl.h>
 #include <sys/syscall.h>
 #endif
 
-#if defined(WEBRTC_WIN)
-#include "rtc_base/arraysize.h"
+#if defined(WIN32)
+#include <stddef.h>
+template <typename T, size_t N>
+char (&ArraySizeHelper(T (&array)[N]))[N];
+
+#define arraysize(array) (sizeof(ArraySizeHelper(array)))
 
 // The SetThreadDescription API was brought in version 1607 of Windows 10.
 // For compatibility with various versions of winuser and avoid clashing with
