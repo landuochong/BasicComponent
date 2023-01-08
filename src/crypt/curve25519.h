@@ -1,9 +1,9 @@
 #include <openssl/ssl.h>
 #include <openssl/kdf.h>
 #include "openssl/md5.h"
-#include "mars/comm/strutil.h"
+#include "utils/strutil.h"
 #include "openssl/aes.h"
-#include "mars/comm/crypt/ibase64.h"
+#include "crypt/ibase64.h"
 #include "openssl/pem.h"
 
 static std::string sha256Hex(unsigned char* str, int len)

@@ -27,8 +27,6 @@
 #include <algorithm>
 #include <locale>
 
-#include "comm/xlogger/xlogger.h"
-
 #ifdef WIN32
 #define snprintf _snprintf
 #endif
@@ -240,7 +238,7 @@ std::string String2UTF8(const std::string& str)
 {
     int nwLen = ::MultiByteToWideChar(CP_ACP, 0, str.c_str(), -1, NULL, 0);
 
-    wchar_t* pwBuf = new wchar_t[nwLen + 1];//Ò»¶¨Òª¼Ó1£¬²»È»»á³öÏÖÎ²°Í
+    wchar_t* pwBuf = new wchar_t[nwLen + 1];//Ò»ï¿½ï¿½Òªï¿½ï¿½1ï¿½ï¿½ï¿½ï¿½È»ï¿½ï¿½ï¿½ï¿½ï¿½Î²ï¿½ï¿½
     ZeroMemory(pwBuf, nwLen * 2 + 2);
 
     ::MultiByteToWideChar(CP_ACP, 0, str.c_str(), str.length(), pwBuf, nwLen);

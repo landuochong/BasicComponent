@@ -1,7 +1,7 @@
 
 /**
 @file
-@brief Base64¼ÓÃÜ½âÃÜº¯Êı
+@brief Base64åŠ å¯†è§£å¯†å‡½æ•°
   $Id$
 @author $Author$
 @date $Date$
