@@ -9,7 +9,8 @@ DESTDIR = $$PWD/../build
 DEFINES += QT_DEPRECATED_WARNINGS
 
 
-CONFIG += c++11
+CONFIG += c++17
+
 CONFIG+=force_debug_info
 CONFIG+=separate_debug_info
 

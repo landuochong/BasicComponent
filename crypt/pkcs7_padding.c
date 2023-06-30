@@ -5,11 +5,8 @@
 
 #include <string.h>
 
-#include "assert/__assert.h"
-
 unsigned char pkcs7_padding_plus_len(unsigned int _datalen, unsigned char _blocksize)
 {
-    ASSERT2(0<_blocksize && 0<_datalen, "datalen=%u, blocksize=%u", _datalen, _blocksize);
     if (!(0<_blocksize && 0<_datalen)) return 0;
     return (unsigned char)(_blocksize - _datalen%_blocksize);
 }
@@ -25,7 +22,6 @@ unsigned int pkcs7_padding_len(unsigned int _datalen, unsigned char _blocksize)
 unsigned int pkcs7_padding(void* _data, unsigned int _datalen, unsigned char _blocksize)
 {
     unsigned char plus_len = 0;
-    ASSERT(NULL!=_data);
     if (NULL==_data) return 0;
 
     plus_len = pkcs7_padding_plus_len(_datalen, _blocksize);
@@ -39,7 +35,6 @@ unsigned int pkcs7_depadding(const void* _data, unsigned int _datapaddinglen)
     unsigned char plus_len = 0;
     unsigned int offset = 0;
 
-    ASSERT2(NULL!=_data && 0<_datapaddinglen, "_data=%p, _datapaddinglen=%u", _data, _datapaddinglen);
     if (!(NULL!=_data && 0<_datapaddinglen)) return 0;
 
     plus_len = ((const unsigned char*)_data)[_datapaddinglen-1];
