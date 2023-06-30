@@ -17,7 +17,6 @@
 *.vcxproj
 *.vcxproj.filters
 /build
-/build*
 /out
 /src/third_party
 /.vscode
