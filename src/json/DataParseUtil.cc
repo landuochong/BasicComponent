@@ -1,5 +1,5 @@
 #include "DataParseUtil.h"
-namespace lego_comm
+namespace basic_comm
 {
 
     std::string DataParseUtil::getLevelStr(int level)

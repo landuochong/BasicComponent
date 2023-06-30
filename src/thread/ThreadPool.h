@@ -12,11 +12,11 @@
 #include <functional>
 #include <stdexcept>
 #include "thread/thread_types.h"
-namespace lego_comm{
+namespace basic_comm{
     class ThreadPool {
     public:
-        CoreThreadPool(std::string name,size_t);
-        ~CoreThreadPool();
+        ThreadPool(std::string name,size_t);
+        ~ThreadPool();
 
         /**
          * two method to call class method:
@@ -73,7 +73,7 @@ namespace lego_comm{
     };
 
     // the constructor just launches some amount of workers
-    inline CoreThreadPool::CoreThreadPool(std::string name, size_t threads)
+    inline ThreadPool::ThreadPool(std::string name, size_t threads)
         :   stop(false)
     {
         this->name = name;
@@ -119,7 +119,7 @@ namespace lego_comm{
 
     // add new work item to the pool
     template<class F, class... Args>
-    auto CoreThreadPool::enqueue(F&& f, Args&&... args)
+    auto ThreadPool::enqueue(F&& f, Args&&... args)
     -> std::future<typename std::result_of<F(Args...)>::type>
     {
         using return_type = typename std::result_of<F(Args...)>::type;
@@ -145,7 +145,7 @@ namespace lego_comm{
     }
 
 	template<class F, class... Args>
-	auto CoreThreadPool::enqueue_first(F&& f, Args&&... args)
+    auto ThreadPool::enqueue_first(F&& f, Args&&... args)
 		-> std::future<typename std::result_of<F(Args...)>::type>
 	{
 		using return_type = typename std::result_of<F(Args...)>::type;
@@ -171,7 +171,7 @@ namespace lego_comm{
 	}
 
     // the destructor joins all threads
-    inline CoreThreadPool::~CoreThreadPool()
+    inline ThreadPool::~ThreadPool()
     {
         {
             std::unique_lock<std::mutex> lock(queue_mutex);

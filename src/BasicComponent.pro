@@ -26,18 +26,18 @@ win32{
     QMAKE_LFLAGS_RELEASE += /MAP /DEBUG /opt:ref /INCREMENTAL:NO
 }
 
-INCLUDEPATH += $$PWD/../third_party/openssl/include
+INCLUDEPATH += $$PWD/third_party/openssl/include
 INCLUDEPATH += $$PWD/platform/windows
 
 include(BasicComponent.pri)
 
 
 contains(DEFINES, WIN64){
-    LIBS += -L$$PWD/../third_party/openssl/openssl_lib_windows/x64/ -llibcrypto
-    LIBS += -L$$PWD/../third_party/openssl/openssl_lib_windows/x64/ -llibssl
+    LIBS += -L$$PWD/third_party/openssl/openssl_lib_windows/x64/ -llibcrypto
+    LIBS += -L$$PWD/third_party/openssl/openssl_lib_windows/x64/ -llibssl
 }else{
-    LIBS += -L$$PWD/../third_party/openssl/openssl_lib_windows/x86/ -llibcrypto
-    LIBS += -L$$PWD/../third_party/openssl/openssl_lib_windows/x86/ -llibssl
+    LIBS += -L$$PWD/third_party/openssl/openssl_lib_windows/x86/ -llibcrypto
+    LIBS += -L$$PWD/third_party/openssl/openssl_lib_windows/x86/ -llibssl
 }
 
 win32{

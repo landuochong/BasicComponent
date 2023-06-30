@@ -6,7 +6,7 @@
 #ifndef DATAPARSEUTIL_H
 #define DATAPARSEUTIL_H
 #include "json/json.h"
-namespace lego_comm
+namespace basic_comm
 {
     class DataParseUtil
     {

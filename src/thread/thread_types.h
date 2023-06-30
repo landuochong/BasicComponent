@@ -15,7 +15,8 @@
 #endif
 // clang-format on
 
-namespace lego_comm {
+namespace basic_comm {
+
 #if defined(WIN32)
 typedef DWORD PlatformThreadId;
 typedef DWORD PlatformThreadRef;
