@@ -24,6 +24,12 @@ thread：线程相关，线程池，线程名称
 
 依赖库：加密依赖OpenSSL
 
+下载代码：
+
+1.下载.gclient和.gclient_entries，放到目录下
+
+2.执行gclient sync
+
 
 
 参考文档：
