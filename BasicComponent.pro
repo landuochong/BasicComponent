@@ -1,4 +1,4 @@
-CONFIG   -= qt
+CONFIG   -= gui
 
 TARGET = BasicComponent
 TEMPLATE = lib
@@ -8,6 +8,7 @@ DESTDIR = $$PWD/../build
 
 DEFINES += QT_DEPRECATED_WARNINGS
 
+DEFINES += WEBRTC_WIN
 
 CONFIG += c++17
 
@@ -28,6 +29,7 @@ win32{
 }
 
 INCLUDEPATH += $$PWD/third_party/openssl/include
+INCLUDEPATH += $$PWD/third_party/abseil-cpp/
 INCLUDEPATH += $$PWD/platform/windows
 
 include(BasicComponent.pri)

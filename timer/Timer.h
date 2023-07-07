@@ -5,7 +5,7 @@
 #include <atomic>
 #include <memory>
 #include <mutex>
-#include <qDebug>
+#include <QDebug>
 
 #include<ctime>
 #include <condition_variable>
@@ -65,7 +65,7 @@ public:
 				{
 					if (!try_to_expire_)
 					{
-						qDebug() << " timer task_ exec++++++++++++++++++++++++++++++++++++++++++++++++++\n";
+                        qDebug() << " timer task_ exec++++++++++++++++++++++++++++++++++++++++++++++++++\n";
 						task();
 						startTime = clock();
 					}
@@ -92,7 +92,6 @@ public:
 
 		if (expired_)
 			try_to_expire_ = false;
-		task_ = nullptr;
 		hasStarted = false;
 	}
 
