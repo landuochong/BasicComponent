@@ -32,6 +32,7 @@
 #include "absl/algorithm/container.h"
 #include "absl/cleanup/cleanup.h"
 #include "thread_types.h"
+#include "time_utils.h"
 
 #if defined(WEBRTC_MAC)
 #include "rtc_base/system/cocoa_threading.h"
@@ -99,8 +100,7 @@ void Thread::DoDestroy() {
 }
 
 void Thread::WakeUp() {
-  //TODO: event
-
+    event_.Set();
 }
 
 void Thread::Quit() {
@@ -121,7 +121,7 @@ absl::AnyInvocable<void() &&> Thread::Get(int cmsWait) {
 
   int64_t cmsTotal = cmsWait;
   int64_t cmsElapsed = 0;
-  int64_t msStart = TimeMillis();
+  int64_t msStart = TimeUtils::TimeMillis();
   int64_t msCurrent = msStart;
   while (true) {
     // Check for posted events
@@ -134,8 +134,7 @@ absl::AnyInvocable<void() &&> Thread::Get(int cmsWait) {
       // next trigger time.
       while (!delayed_messages_.empty()) {
         if (msCurrent < delayed_messages_.top().run_time_ms) {
-          cmsDelayNext =
-              TimeDiff(delayed_messages_.top().run_time_ms, msCurrent);
+          cmsDelayNext = delayed_messages_.top().run_time_ms - msCurrent;
           break;
         }
         messages_.push(std::move(delayed_messages_.top().functor));
@@ -165,16 +164,15 @@ absl::AnyInvocable<void() &&> Thread::Get(int cmsWait) {
 
     {
       // Wait and multiplex in the meantime
-      if (!ss_->Wait(cmsNext == kForever ? SocketServer::kForever
-                                         : webrtc::TimeDelta::Millis(cmsNext),
-                     /*process_io=*/true))
+      if (!event_.Wait(cmsNext == kForever ? Event::kForever
+                                         : TimeUtils::TimeAfter(cmsNext),Event::kForever))
         return nullptr;
     }
 
     // If the specified timeout expired, return
 
-    msCurrent = TimeMillis();
-    cmsElapsed = TimeDiff(msCurrent, msStart);
+    msCurrent = TimeUtils::TimeMillis();
+    cmsElapsed = msCurrent - msStart;
     if (cmsWait != kForever) {
       if (cmsElapsed >= cmsWait)
         return nullptr;
@@ -191,7 +189,6 @@ void Thread::PostTask(absl::AnyInvocable<void() &&> task) {
   // Keep thread safe
   // Add the message to the end of the queue
   // Signal for the multiplexer to return
-
   {
     MutexLock lock(&mutex_);
     messages_.push(std::move(task));
@@ -200,7 +197,7 @@ void Thread::PostTask(absl::AnyInvocable<void() &&> task) {
 }
 
 void Thread::PostDelayedHighPrecisionTask(absl::AnyInvocable<void() &&> task,
-                                          webrtc::TimeDelta delay) {
+                                          int64_t delay_us) {
   if (IsQuitting()) {
     return;
   }
@@ -208,9 +205,8 @@ void Thread::PostDelayedHighPrecisionTask(absl::AnyInvocable<void() &&> task,
   // Keep thread safe
   // Add to the priority queue. Gets sorted soonest first.
   // Signal for the multiplexer to return.
-
-  int64_t delay_ms = delay.RoundUpTo(webrtc::TimeDelta::Millis(1)).ms<int>();
-  int64_t run_time_ms = TimeAfter(delay_ms);
+  int64_t delay_ms = delay_us%1000>0?delay_us/1000+1:delay_us/1000;
+  int64_t run_time_ms = TimeUtils::TimeAfter(delay_ms);
   {
     MutexLock lock(&mutex_);
     delayed_messages_.push({.delay_ms = delay_ms,
@@ -232,23 +228,20 @@ int Thread::GetDelay() {
     return 0;
 
   if (!delayed_messages_.empty()) {
-    int delay = TimeUntil(delayed_messages_.top().run_time_ms);
+    int delay = TimeUtils::TimeUntil(delayed_messages_.top().run_time_ms);
     if (delay < 0)
       delay = 0;
     return delay;
   }
-
   return kForever;
 }
 
 void Thread::Dispatch(absl::AnyInvocable<void() &&> task) {
-  int64_t start_time = TimeMillis();
+  int64_t start_time = TimeUtils::TimeMillis();
   std::move(task)();
-  int64_t end_time = TimeMillis();
-  int64_t diff = TimeDiff(end_time, start_time);
+  int64_t end_time = TimeUtils::TimeMillis();
+  int64_t diff = TimeUtils::TimeDiff(end_time, start_time);
   if (diff >= dispatch_warning_ms_) {
-    RTC_LOG(LS_INFO) << "Message to " << name() << " took " << diff
-                     << "ms to dispatch.";
     // To avoid log spew, move the warning limit to only give warning
     // for delays that are larger than the one observed.
     dispatch_warning_ms_ = diff + 1;
@@ -257,8 +250,6 @@ void Thread::Dispatch(absl::AnyInvocable<void() &&> task) {
 
 
 bool Thread::SleepMs(int milliseconds) {
-  AssertBlockingIsAllowedOnCurrentThread();
-
 #if defined(WEBRTC_WIN)
   ::Sleep(milliseconds);
   return true;
@@ -341,23 +332,21 @@ void Thread::Join() {
 #endif
 }
 
-bool Thread::SetAllowBlockingCalls(bool allow) {
-  bool previous = blocking_calls_allowed_;
-  blocking_calls_allowed_ = allow;
-  return previous;
-}
-
 // static
 #if defined(WEBRTC_WIN)
 DWORD WINAPI Thread::PreRun(LPVOID pv) {
 #else
 void* Thread::PreRun(void* pv) {
 #endif
+
   Thread* thread = static_cast<Thread*>(pv);
   basic_comm::SetCurrentThreadName(thread->name_.c_str());
+  thread->cur_thread_id_ = basic_comm::CurrentThreadId();
+
 #if defined(WEBRTC_MAC)
   ScopedAutoReleasePool pool;
 #endif
+
   thread->Run();
 
 #ifdef WEBRTC_WIN
@@ -380,72 +369,35 @@ void Thread::Stop() {
   Join();
 }
 
+bool Thread::IsCurrent() const {
+  return basic_comm::CurrentThreadId() == cur_thread_id_;
+}
+
 void Thread::BlockingCall(rtc::FunctionView<void()> functor) {
   if (IsQuitting())
     return;
 
-  if (IsCurrent()) {
-#if RTC_DCHECK_IS_ON
-    RTC_DCHECK(this->IsInvokeToThreadAllowed(this));
-    RTC_DCHECK_RUN_ON(this);
-    could_be_blocking_call_count_++;
-#endif
+  if (IsCurrent()) {//判断是当前线程执行
     functor();
     return;
   }
 
   AssertBlockingIsAllowedOnCurrentThread();
 
-  Thread* current_thread = Thread::Current();
+  //需要阻塞当前调用线程的所有任务，来等待当前执行线程的结果
 
   // Perhaps down the line we can get rid of this workaround and always require
   // current_thread to be valid when BlockingCall() is called.
   std::unique_ptr<rtc::Event> done_event;
-  if (!current_thread)
-    done_event.reset(new rtc::Event());
+  done_event.reset(new rtc::Event());
 
   bool ready = false;
-  absl::Cleanup cleanup = [this, &ready, current_thread,
-                           done = done_event.get()] {
-    if (current_thread) {
-      {
-        MutexLock lock(&mutex_);
-        ready = true;
-      }
-      current_thread->WakeUp();
-    } else {
+  absl::Cleanup cleanup = [this, &ready, done = done_event.get()] {
       done->Set();
-    }
   };
+  //添加任务
   PostTask([functor, cleanup = std::move(cleanup)] { functor(); });
-  if (current_thread) {
-    bool waited = false;
-    mutex_.Lock();
-    while (!ready) {
-      mutex_.Unlock();
-      current_thread->Wait(SocketServer::kForever, false);
-      waited = true;
-      mutex_.Lock();
-    }
-    mutex_.Unlock();
-
-    // Our Wait loop above may have consumed some WakeUp events for this
-    // Thread, that weren't relevant to this Send.  Losing these WakeUps can
-    // cause problems for some SocketServers.
-    //
-    // Concrete example:
-    // Win32SocketServer on thread A calls Send on thread B.  While processing
-    // the message, thread B Posts a message to A.  We consume the wakeup for
-    // that Post while waiting for the Send to complete, which means that when
-    // we exit this loop, we need to issue another WakeUp, or else the Posted
-    // message won't be processed in a timely manner.
-
-    if (waited) {
-      current_thread->WakeUp();
-    }
-  } else {
-    done_event->Wait(rtc::Event::kForever);
-  }
+  done_event->Wait(rtc::Event::kForever);
 }
 
 // Called by the ThreadManager when being set as the current thread.
@@ -465,17 +417,18 @@ void Thread::Delete() {
 }
 
 void Thread::PostDelayedTask(absl::AnyInvocable<void() &&> task,
-                             webrtc::TimeDelta delay) {
+                             int64_t delay_us) {
   // This implementation does not support low precision yet.
-  PostDelayedHighPrecisionTask(std::move(task), delay);
+  PostDelayedHighPrecisionTask(std::move(task), delay_us);
 }
 
 bool Thread::IsProcessingMessagesForTesting() {
   return (owned_ || IsCurrent()) && !IsQuitting();
 }
 
+//cmsLoop:ms
 bool Thread::ProcessMessages(int cmsLoop) {
-  int64_t msEnd = (kForever == cmsLoop) ? 0 : TimeAfter(cmsLoop);
+  int64_t msEnd = (kForever == cmsLoop) ? 0 : TimeUtils::TimeAfter(cmsLoop);
   int cmsNext = cmsLoop;
 
   while (true) {
@@ -488,7 +441,7 @@ bool Thread::ProcessMessages(int cmsLoop) {
     Dispatch(std::move(task));
 
     if (cmsLoop != kForever) {
-      cmsNext = static_cast<int>(TimeUntil(msEnd));
+      cmsNext = static_cast<int>(TimeUtils::TimeUntil(msEnd));
       if (cmsNext < 0)
         return true;
     }

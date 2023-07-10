@@ -3,8 +3,13 @@
 
 #include <stdint.h>
 #include <stdio.h>
-class TimeUtils{
-public:
-    static uint64_t gettickcount();  // ms
+namespace TimeUtils {
+    uint64_t TimeMillis();  // ms
+    int64_t TimeDiff(int64_t later, int64_t earlier);
+    int64_t TimeAfter(int64_t elapsed);
+
+    inline int64_t TimeUntil(int64_t later) {
+      return later - TimeMillis();
+    }
 };
 #endif /* TIME_UTILS_H_ */

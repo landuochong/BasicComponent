@@ -51,7 +51,7 @@ bool Event::Wait(int64_t give_up_after, int64_t /*warn_after*/) {
   const DWORD ms =
       give_up_after == kForever
           ? INFINITE
-          : give_up_after;
+          : (give_up_after%1000>0?give_up_after/1000+1:give_up_after/1000);//RoundUpToMillis
   return (WaitForSingleObject(event_handle_, ms) == WAIT_OBJECT_0);
 }
 
@@ -106,7 +106,7 @@ void Event::Reset() {
 
 namespace {
 
-timespec GetTimespec(int64_t duration_from_now) {//ms
+timespec GetTimespec(int64_t duration_from_now) {//us
   timespec ts;
 
   // Get the current time.
@@ -120,9 +120,9 @@ timespec GetTimespec(int64_t duration_from_now) {//ms
 #endif
 
   // Add the specified number of milliseconds to it.
-  ts.tv_sec += duration_from_now / kNumMillisecsPerSec;
+  ts.tv_sec += duration_from_now / kNumMicrosecsPerSec;
   ts.tv_nsec +=
-      (duration_from_now % kNumMillisecsPerSec) * kNumNanosecsPerMillisec;
+      (duration_from_now % kNumMicrosecsPerSec) * kNumNanosecsPerMicrosec;
 
   // Normalize.
   if (ts.tv_nsec >= kNumNanosecsPerSec) {//?

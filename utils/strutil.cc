@@ -10,14 +10,6 @@
 // either express or implied. See the License for the specific language governing permissions and
 // limitations under the License.
 
-////////////////////////////////////////////////////////////////////////////////
-// @(#) strutil.cc
-// Utilities for std::string
-// defined in namespace strutil
-// by James Fancy
-//Support for Symbian
-// yerungui
-////////////////////////////////////////////////////////////////////////////////
 
 #include "strutil.h"
 #include <stdio.h>
@@ -33,8 +25,6 @@
 
 namespace strutil
 {
-
-
     
 std::string& URLEncode(const std::string& _url, std::string& _encode_url) {
     std::string::const_iterator iter = _url.begin();
@@ -238,7 +228,7 @@ std::string String2UTF8(const std::string& str)
 {
     int nwLen = ::MultiByteToWideChar(CP_ACP, 0, str.c_str(), -1, NULL, 0);
 
-    wchar_t* pwBuf = new wchar_t[nwLen + 1];//һ��Ҫ��1����Ȼ�����β��
+    wchar_t* pwBuf = new wchar_t[nwLen + 1];//一定要加1，不然会出现尾巴
     ZeroMemory(pwBuf, nwLen * 2 + 2);
 
     ::MultiByteToWideChar(CP_ACP, 0, str.c_str(), str.length(), pwBuf, nwLen);

@@ -10,15 +10,6 @@
 // either express or implied. See the License for the specific language governing permissions and
 // limitations under the License.
 
-
-////////////////////////////////////////////////////////////////////////////////
-// @(#) strutil.h
-// Utilities for string
-// defined in namespace strutil
-// Support for Symbian
-// yerungui
-////////////////////////////////////////////////////////////////////////////////
-
 #ifndef COMM_STRUTIL_H_
 #define COMM_STRUTIL_H_
 

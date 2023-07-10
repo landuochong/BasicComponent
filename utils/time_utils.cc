@@ -1,6 +1,9 @@
 #include "time_utils.h"
 
 #include <stdint.h>
+
+namespace TimeUtils {
+
 #ifdef ANDROID
 #include <time.h>
 #include <errno.h>
@@ -16,6 +19,7 @@
 #include <fcntl.h>
 #include <unistd.h>
 
+//ms
 uint64_t rtc_gettickcount() {
     static int s_fd = -1;
     static int errcode  = 0;
@@ -140,7 +144,9 @@ uint64_t rtc_gettickcount() {
 #endif
 
 
-
-uint64_t TimeUtils::gettickcount(){
+//ms
+uint64_t TimeMillis(){
     return rtc_gettickcount();
+}
+
 }

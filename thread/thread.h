@@ -39,6 +39,7 @@
 
 #include "function_view.h"
 #include "task_queue_base.h"
+#include "thread_types.h"
 
 #define RTC_LOG_THREAD_BLOCK_COUNT()
 #define RTC_DCHECK_BLOCK_COUNT_NO_MORE_THAN(x)
@@ -158,9 +159,9 @@ class Thread : public webrtc::TaskQueueBase {
   void Delete() override;
   void PostTask(absl::AnyInvocable<void() &&> task) override;
   void PostDelayedTask(absl::AnyInvocable<void() &&> task,
-                       int64_t delay_ms) override;
+                       int64_t delay_us) override;
   void PostDelayedHighPrecisionTask(absl::AnyInvocable<void() &&> task,
-                                    int64_t delay_ms) override;
+                                    int64_t delay_us) override;
 
   // ProcessMessages will process I/O and dispatch messages until:
   //  1) cms milliseconds have elapsed (returns true)
@@ -191,10 +192,6 @@ class Thread : public webrtc::TaskQueueBase {
   // owned to false. This must be called from the current thread.
   bool WrapCurrent();
   void UnwrapCurrent();
-
-  // Sets the per-thread allow-blocking-calls flag to false; this is
-  // irrevocable. Must be called on this thread.
-  void DisallowBlockingCalls() { SetAllowBlockingCalls(false); }
 
  protected:
   // DelayedMessage goes into a priority queue, sorted by trigger time. Messages
@@ -235,10 +232,6 @@ class Thread : public webrtc::TaskQueueBase {
   // Blocks the calling thread until this thread has terminated.
   void Join();
 
-  static void AssertBlockingIsAllowedOnCurrentThread();
-
-  friend class ScopedDisallowBlockingCalls;
-
  private:
   static const int kSlowDispatchLoggingThreshold = 50;  // 50 ms
 
@@ -249,9 +242,6 @@ class Thread : public webrtc::TaskQueueBase {
   absl::AnyInvocable<void() &&> Get(int cmsWait);
   void Dispatch(absl::AnyInvocable<void() &&> task);
 
-  // Sets the per-thread allow-blocking-calls flag and returns the previous
-  // value. Must be called on this thread.
-  bool SetAllowBlockingCalls(bool allow);
 
 #if defined(WEBRTC_WIN)
   static DWORD WINAPI PreRun(LPVOID context);
@@ -276,6 +266,8 @@ class Thread : public webrtc::TaskQueueBase {
   bool fInitialized_;
   bool fDestroyed_;
 
+  Event event_;
+
   std::atomic<int> stop_;
   std::string name_;
 
@@ -284,23 +276,18 @@ class Thread : public webrtc::TaskQueueBase {
 #if defined(WEBRTC_POSIX)
   pthread_t thread_ = 0;
 #endif
-
 #if defined(WEBRTC_WIN)
   HANDLE thread_ = nullptr;
   DWORD thread_id_ = 0;
 #endif
 
+  basic_comm::PlatformThreadId cur_thread_id_ = 0;
   // Indicates whether or not ownership of the worker thread lies with
   // this instance or not. (i.e. owned_ == !wrapped).
   // Must only be modified when the worker thread is not running.
   bool owned_ = true;
 
-  // Only touched from the worker thread itself.
-  bool blocking_calls_allowed_ = true;
-
-  std::unique_ptr<TaskQueueBase::CurrentTaskQueueSetter>
-      task_queue_registration_;
-
+  std::unique_ptr<TaskQueueBase::CurrentTaskQueueSetter> task_queue_registration_;
   int dispatch_warning_ms_ RTC_GUARDED_BY(this) = kSlowDispatchLoggingThreshold;
 };
 

@@ -58,13 +58,13 @@ class Event {
   //
   // Returns true if the event was signaled, false if there was a timeout or
   // some other error.
-  //give_up_after:ms, warn_after:ms
+  //give_up_after:us, warn_after:us
   bool Wait(int64_t give_up_after, int64_t warn_after);
 
   //如果无限等待，则3s提醒一次，否则不需中间提醒
   bool Wait(int64_t give_up_after) {
     return Wait(give_up_after, give_up_after == kForever
-                                   ? 3000
+                                   ? 3*1'000'000
                                    : kForever);
   }
 

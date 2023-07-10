@@ -28,6 +28,12 @@ win32{
     QMAKE_LFLAGS_RELEASE += /MAP /DEBUG /opt:ref /INCREMENTAL:NO
 }
 
+INCLUDEPATH += $$PWD/thread
+INCLUDEPATH += $$PWD/json
+INCLUDEPATH += $$PWD/json
+INCLUDEPATH += $$PWD/timer
+INCLUDEPATH += $$PWD/utils
+
 INCLUDEPATH += $$PWD/third_party/openssl/include
 INCLUDEPATH += $$PWD/third_party/abseil-cpp/
 INCLUDEPATH += $$PWD/platform/windows
