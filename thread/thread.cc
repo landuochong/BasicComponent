@@ -28,6 +28,8 @@
 
 #include <utility>
 
+#include <QDebug>
+
 #include "absl/algorithm/container.h"
 #include "absl/cleanup/cleanup.h"
 #include "thread_types.h"
@@ -115,11 +117,11 @@ void Thread::Restart() {
 
 absl::AnyInvocable<void() &&> Thread::Get(int cmsWait) {
   // Get w/wait + timer scan / dispatch + socket / event multiplexer dispatch
-
   int64_t cmsTotal = cmsWait;
   int64_t cmsElapsed = 0;
   int64_t msStart = TimeUtils::TimeMillis();
   int64_t msCurrent = msStart;
+
   while (true) {
     // Check for posted events
     int64_t cmsDelayNext = kForever;
@@ -132,6 +134,7 @@ absl::AnyInvocable<void() &&> Thread::Get(int cmsWait) {
       while (!delayed_messages_.empty()) {
         if (msCurrent < delayed_messages_.top().run_time_ms) {
           cmsDelayNext = delayed_messages_.top().run_time_ms - msCurrent;
+//          qDebug()<<"Get cmsDelayNext="<<cmsDelayNext;
           break;
         }
         messages_.push(std::move(delayed_messages_.top().functor));
@@ -149,7 +152,6 @@ absl::AnyInvocable<void() &&> Thread::Get(int cmsWait) {
       break;
 
     // Which is shorter, the delay wait or the asked wait?
-
     int64_t cmsNext;
     if (cmsWait == kForever) {
       cmsNext = cmsDelayNext;
@@ -161,20 +163,21 @@ absl::AnyInvocable<void() &&> Thread::Get(int cmsWait) {
 
     {
       // Wait and multiplex in the meantime
-      if (!event_.Wait(cmsNext == kForever ? Event::kForever
-                                         : TimeUtils::TimeAfter(cmsNext),Event::kForever))
-        return nullptr;
+        event_.Wait(cmsNext == kForever ? Event::kForever
+                                         : cmsNext*1000,Event::kForever);
     }
 
     // If the specified timeout expired, return
-
     msCurrent = TimeUtils::TimeMillis();
     cmsElapsed = msCurrent - msStart;
     if (cmsWait != kForever) {
-      if (cmsElapsed >= cmsWait)
+      if (cmsElapsed >= cmsWait){
+
         return nullptr;
+      }
     }
   }
+
   return nullptr;
 }
 
@@ -203,7 +206,9 @@ void Thread::PostDelayedHighPrecisionTask(absl::AnyInvocable<void() &&> task,
   // Add to the priority queue. Gets sorted soonest first.
   // Signal for the multiplexer to return.
   int64_t delay_ms = delay_us%1000>0?delay_us/1000+1:delay_us/1000;
+
   int64_t run_time_ms = TimeUtils::TimeAfter(delay_ms);
+
   {
     MutexLock lock(&mutex_);
 
@@ -430,14 +435,17 @@ bool Thread::ProcessMessages(int cmsLoop) {
     ScopedAutoReleasePool pool;
 #endif
     absl::AnyInvocable<void()&&> task = Get(cmsNext);
-    if (!task)
+    if (!task){
       return !IsQuitting();
+    }
+
     Dispatch(std::move(task));
 
     if (cmsLoop != kForever) {
       cmsNext = static_cast<int>(TimeUtils::TimeUntil(msEnd));
-      if (cmsNext < 0)
+      if (cmsNext < 0){
         return true;
+      }
     }
   }
 }

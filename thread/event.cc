@@ -21,6 +21,8 @@
 #error "Must define either WEBRTC_WIN or WEBRTC_POSIX."
 #endif
 
+#include <QDebug>
+
 namespace basic_comm {
 
 Event::Event() : Event(false, false) {}
@@ -31,6 +33,10 @@ Event::Event(bool manual_reset, bool initially_signaled) {
   event_handle_ = ::CreateEvent(nullptr,  // Security attributes.
                                 manual_reset, initially_signaled,
                                 nullptr);  // Name.
+
+  if(!event_handle_){
+    qDebug()<<"CreateEvent Fail";
+  }
 }
 
 Event::~Event() {

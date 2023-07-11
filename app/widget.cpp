@@ -10,7 +10,7 @@
 #include <windows.h>
 #include <unordered_map>
 #include <string>
-#include <QTimer>
+#include <QTime>
 #include <sstream>
 #include <io.h>
 #include<iomanip>
@@ -30,26 +30,29 @@ Widget::Widget(QWidget *parent) :
 }
 
 void blockingTask() {
-    qDebug() << "Running blocking task";
-    std::this_thread::sleep_for(std::chrono::seconds(5));
+    std::this_thread::sleep_for(std::chrono::seconds(1));
+    qDebug() << "Running blocking task"<< QTime::currentTime().toString("hh:mm:ss.zzz");
 }
 
 
 void Widget::on_btn_send_clicked(){
-    qDebug()<<"on_btn_send_clicked";
-
-    thread.PostTask([&]{
-        std::this_thread::sleep_for(std::chrono::seconds(2));
-        qDebug()<<"PostTask";
-    });
+    qDebug()<<"on_btn_send_clicked "<< QTime::currentTime().msec();;
 
     thread.PostTask([&]{
         std::this_thread::sleep_for(std::chrono::seconds(1));
-        qDebug()<<"PostTask2";
+        qDebug()<<"PostTask " << QTime::currentTime().toString("hh:mm:ss.zzz");
     });
 
+    thread.PostDelayedTask([&]{
+        qDebug()<<"DelayedTask " << QTime::currentTime().toString("hh:mm:ss.zzz");
+    }, 3500000);
+
+    thread.PostDelayedTask([&]{
+        qDebug()<<"DelayedTask " << QTime::currentTime().toString("hh:mm:ss.zzz");
+    }, 3'000'000);
+
     std::thread([&]() {
-        qDebug()<<"start BlockingCall";
+        qDebug()<<"start BlockingCall"<< QTime::currentTime().toString("hh:mm:ss.zzz");
         thread.BlockingCall([]{
             blockingTask();
         });
