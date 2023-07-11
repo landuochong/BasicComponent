@@ -14,7 +14,7 @@
 #include <type_traits>
 #include <utility>
 
-namespace rtc {
+namespace basic_comm {
 
 template <typename T>
 class FunctionView;  // Undefined.
@@ -69,7 +69,6 @@ class FunctionView<RetT(ArgT...)> final {
   FunctionView() : call_(nullptr) {}
 
   RetT operator()(ArgT... args) const {
-    RTC_DCHECK(call_);
     return call_(f_, std::forward<ArgT>(args)...);
   }
 

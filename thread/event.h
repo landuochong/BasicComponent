@@ -16,8 +16,7 @@
 #include "thread_annotations.h"
 #include "absl/synchronization/mutex.h"
 
-namespace rtc {
-#define RTC_DISALLOW_WAIT()
+namespace basic_comm {
 
 class RTC_SCOPED_LOCKABLE MutexLock final {
  public:

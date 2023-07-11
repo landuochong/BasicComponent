@@ -208,7 +208,9 @@ SPLITTOKEN(std::string)
 SPLITTOKEN(std::wstring)
 
 #ifdef WIN32
+
 #include <Windows.h>
+
 std::wstring String2WString(const std::string& _src, unsigned int _cp) {
     const int len = static_cast<int>(_src.length());
     std::wstring enc;
@@ -226,19 +228,19 @@ std::wstring UTF8String2Wstring(const std::string& _src) {
 
 std::string String2UTF8(const std::string& str)
 {
-    int nwLen = ::MultiByteToWideChar(CP_ACP, 0, str.c_str(), -1, NULL, 0);
+    int nwLen = MultiByteToWideChar(CP_ACP, 0, str.c_str(), -1, NULL, 0);
 
     wchar_t* pwBuf = new wchar_t[nwLen + 1];//一定要加1，不然会出现尾巴
     ZeroMemory(pwBuf, nwLen * 2 + 2);
 
-    ::MultiByteToWideChar(CP_ACP, 0, str.c_str(), str.length(), pwBuf, nwLen);
+    MultiByteToWideChar(CP_ACP, 0, str.c_str(), str.length(), pwBuf, nwLen);
 
-    int nLen = ::WideCharToMultiByte(CP_UTF8, 0, pwBuf, -1, NULL, NULL, NULL, NULL);
+    int nLen = WideCharToMultiByte(CP_UTF8, 0, pwBuf, -1, NULL, NULL, NULL, NULL);
 
     char* pBuf = new char[nLen + 1];
     ZeroMemory(pBuf, nLen + 1);
 
-    ::WideCharToMultiByte(CP_UTF8, 0, pwBuf, nwLen, pBuf, nLen, NULL, NULL);
+    WideCharToMultiByte(CP_UTF8, 0, pwBuf, nwLen, pBuf, nLen, NULL, NULL);
 
     std::string retStr(pBuf);
 
@@ -294,7 +296,6 @@ std::string Hex2Str(const char* _str, unsigned int _len) {
 
 std::string Str2Hex(const char* _str, unsigned int _len) {
     if (_len > 1024) {
-        xassert2(false, TSF"string length %_ too long.", _len);
         return "";
     }
     char outbuffer[512];
@@ -325,7 +326,6 @@ std::string Str2Hex(const char* _str, unsigned int _len) {
 std::string ReplaceChar(const char* const input_str, char be_replaced, char replace_with) {
     std::string output_str(input_str);
     size_t len = output_str.size();
-    xassert2(len<16*1024, TSF"input_str:%_", input_str);
     for(size_t i=0; i<len; ++i) {
         if (be_replaced == output_str[i]) {
             output_str[i] = replace_with;
@@ -374,7 +374,6 @@ std::string MD5DigestToBase16(const uint8_t digest[16]){
 }
 
 std::string DigestToBase16(const uint8_t *digest, size_t length){
-    assert(length % 2 == 0);
     static char const zEncode[] = "0123456789abcdef";
     
     std::string ret;

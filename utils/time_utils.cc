@@ -149,4 +149,12 @@ uint64_t TimeMillis(){
     return rtc_gettickcount();
 }
 
+int64_t TimeDiff(int64_t later, int64_t earlier){
+    return later - earlier;
+}
+
+int64_t TimeAfter(int64_t elapsed){
+  return TimeMillis() + elapsed;
+}
+
 }

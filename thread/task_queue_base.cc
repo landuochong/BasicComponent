@@ -1,11 +1,10 @@
 #include "task_queue_base.h"
 #include "absl/base/attributes.h"
 #include "absl/base/config.h"
-#include "absl/functional/any_invocable.h"
 
 #if defined(ABSL_HAVE_THREAD_LOCAL)
 
-namespace webrtc {
+namespace basic_comm {
 namespace {
 
 ABSL_CONST_INIT thread_local TaskQueueBase* current = nullptr;

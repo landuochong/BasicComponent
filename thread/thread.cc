@@ -9,7 +9,6 @@
  */
 
 #include "thread.h"
-#include "absl/strings/string_view.h"
 
 #if defined(WEBRTC_WIN)
 #include <comdef.h>
@@ -61,17 +60,15 @@ class ScopedAutoReleasePool {
 }  // namespace
 #endif
 
-namespace rtc {
+namespace basic_comm {
 
-Thread::Thread(bool do_init)
+Thread::Thread()
     : delayed_next_num_(0),
       fInitialized_(false),
       fDestroyed_(false),
       stop_(0){
   SetName("Thread", this);  // default name
-  if (do_init) {
-    DoInit();
-  }
+  DoInit();
 }
 
 
@@ -209,10 +206,12 @@ void Thread::PostDelayedHighPrecisionTask(absl::AnyInvocable<void() &&> task,
   int64_t run_time_ms = TimeUtils::TimeAfter(delay_ms);
   {
     MutexLock lock(&mutex_);
+
     delayed_messages_.push({.delay_ms = delay_ms,
                             .run_time_ms = run_time_ms,
                             .message_number = delayed_next_num_,
-                            .functor = std::move(task)});
+                            .functor = std::move(task)
+                           });
     // If this message queue processes 1 message every millisecond for 50 days,
     // we will wrap this number.  Even then, only messages with identical times
     // will be misordered, and then only briefly.  This is probably ok.
@@ -268,8 +267,8 @@ bool Thread::SleepMs(int milliseconds) {
 #endif
 }
 
-bool Thread::SetName(absl::string_view name, const void* obj) {
-  name_ = std::string(name);
+bool Thread::SetName(std::string name, const void* obj) {
+  name_ = name;
   if (obj) {
     // The %p specifier typically produce at most 16 hex digits, possibly with a
     // 0x prefix. But format is implementation defined, so add some margin.
@@ -370,10 +369,10 @@ void Thread::Stop() {
 }
 
 bool Thread::IsCurrent() const {
-  return basic_comm::CurrentThreadId() == cur_thread_id_;
+  return CurrentThreadId() == cur_thread_id_;
 }
 
-void Thread::BlockingCall(rtc::FunctionView<void()> functor) {
+void Thread::BlockingCall(FunctionView<void()> functor) {
   if (IsQuitting())
     return;
 
@@ -382,22 +381,17 @@ void Thread::BlockingCall(rtc::FunctionView<void()> functor) {
     return;
   }
 
-  AssertBlockingIsAllowedOnCurrentThread();
-
-  //需要阻塞当前调用线程的所有任务，来等待当前执行线程的结果
-
   // Perhaps down the line we can get rid of this workaround and always require
   // current_thread to be valid when BlockingCall() is called.
-  std::unique_ptr<rtc::Event> done_event;
-  done_event.reset(new rtc::Event());
+  std::unique_ptr<Event> done_event;
+  done_event.reset(new Event());
 
-  bool ready = false;
-  absl::Cleanup cleanup = [this, &ready, done = done_event.get()] {
+  absl::Cleanup cleanup = [this, done = done_event.get()] {
       done->Set();
   };
   //添加任务
   PostTask([functor, cleanup = std::move(cleanup)] { functor(); });
-  done_event->Wait(rtc::Event::kForever);
+  done_event->Wait(Event::kForever);
 }
 
 // Called by the ThreadManager when being set as the current thread.

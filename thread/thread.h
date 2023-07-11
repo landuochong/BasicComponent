@@ -23,14 +23,13 @@
 #include <utility>
 #include <vector>
 
-#include "absl/strings/string_view.h"
 #include "event.h"
-
 #if defined(WEBRTC_POSIX)
 #include <pthread.h>
 #endif
 
 #if defined(WEBRTC_WIN)
+#include <winsock2.h>
 #include <windows.h>
 #endif
 
@@ -44,14 +43,14 @@
 #define RTC_LOG_THREAD_BLOCK_COUNT()
 #define RTC_DCHECK_BLOCK_COUNT_NO_MORE_THAN(x)
 
-namespace rtc {
+namespace basic_comm {
 
 
-class Thread : public webrtc::TaskQueueBase {
+class Thread : public TaskQueueBase {
  public:
   static const int kForever = -1;
 
-  Thread(bool do_init);
+  Thread();
 
   // NOTE: ALL SUBCLASSES OF Thread MUST CALL Stop() IN THEIR DESTRUCTORS (or
   // guarantee Stop() is explicitly called before the subclass is destroyed).
@@ -101,7 +100,7 @@ class Thread : public webrtc::TaskQueueBase {
   // Sets the thread's name, for debugging. Must be called before Start().
   // If `obj` is non-null, its value is appended to `name`.
   const std::string& name() const { return name_; }
-  bool SetName(absl::string_view name, const void* obj);
+  bool SetName(std::string name, const void* obj);
 
   // Sets the expected processing time in ms. The thread will write
   // log messages when Dispatch() takes more time than this.
@@ -140,21 +139,6 @@ class Thread : public webrtc::TaskQueueBase {
     return result;
   }
 
-  // Allows BlockingCall to specified `thread`. Thread never will be
-  // dereferenced and will be used only for reference-based comparison, so
-  // instance can be safely deleted. If NDEBUG is defined and RTC_DCHECK_IS_ON
-  // is undefined do nothing.
-  void AllowInvokesToThread(Thread* thread);
-
-  // If NDEBUG is defined and RTC_DCHECK_IS_ON is undefined do nothing.
-  void DisallowAllInvokes();
-  // Returns true if `target` was allowed by AllowInvokesToThread() or if no
-  // calls were made to AllowInvokesToThread and DisallowAllInvokes. Otherwise
-  // returns false.
-  // If NDEBUG is defined and RTC_DCHECK_IS_ON is undefined always returns
-  // true.
-  bool IsInvokeToThreadAllowed(rtc::Thread* target);
-
   // From TaskQueueBase
   void Delete() override;
   void PostTask(absl::AnyInvocable<void() &&> task) override;
@@ -183,15 +167,6 @@ class Thread : public webrtc::TaskQueueBase {
   // question to guarantee that the returned value remains true for the duration
   // of whatever code is conditionally executing because of the return value!
   bool RunningForTest() { return IsRunning(); }
-
-  // These functions are public to avoid injecting test hooks. Don't call them
-  // outside of tests.
-  // This method should be called when thread is created using non standard
-  // method, like derived implementation of rtc::Thread and it can not be
-  // started by calling Start(). This will set started flag to true and
-  // owned to false. This must be called from the current thread.
-  bool WrapCurrent();
-  void UnwrapCurrent();
 
  protected:
   // DelayedMessage goes into a priority queue, sorted by trigger time. Messages
@@ -223,11 +198,6 @@ class Thread : public webrtc::TaskQueueBase {
   void DoDestroy() RTC_EXCLUSIVE_LOCKS_REQUIRED(mutex_);
 
   void WakeUp();
-
-  // Same as WrapCurrent except that it never fails as it does not try to
-  // acquire the synchronization access of the thread. The caller should never
-  // call Stop() or Join() on this thread.
-  void SafeWrapCurrent();
 
   // Blocks the calling thread until this thread has terminated.
   void Join();

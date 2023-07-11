@@ -16,7 +16,7 @@
 #include "absl/functional/any_invocable.h"
 #include "thread_annotations.h"
 
-namespace webrtc {
+namespace basic_comm {
 
 // Asynchronously executes tasks in a way that guarantees that they're executed
 // in FIFO order and that tasks never overlap. Tasks may always execute on the
