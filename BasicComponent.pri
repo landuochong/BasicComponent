@@ -23,5 +23,6 @@ SOURCES += \
     $$PWD/thread/task_queue_base.cc \
     $$PWD/thread/thread.cc \
     $$PWD/thread/thread_types.cc \
+    $$PWD/timer/Timer.cc \
     $$PWD/utils/strutil.cc \
     $$PWD/utils/time_utils.cc
