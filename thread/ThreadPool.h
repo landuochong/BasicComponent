@@ -84,10 +84,10 @@ namespace basic_comm{
             workers.emplace_back(
                         [name, this]
             {
-                    if (threadNum == 1) {
-                        SetCurrentThreadName(name.c_str());
-                    }
-                for(;;)
+                if (threadNum == 1) {
+                    SetCurrentThreadName(name.c_str());
+                }
+                while(true)
                 {
                     std::function<void()> task;
                     {

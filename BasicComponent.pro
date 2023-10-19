@@ -11,7 +11,7 @@ DEFINES += QT_DEPRECATED_WARNINGS
 DEFINES += WEBRTC_WIN
 
 #c++20
-CONFIG += c++2a
+CONFIG += c++17
 
 CONFIG+=force_debug_info
 CONFIG+=separate_debug_info
