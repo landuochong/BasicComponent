@@ -12,8 +12,8 @@ public:
     ~TaskTimer();
 
 public:
-    void Start(int interval, std::function<void()> task);
-    void StartOnce(int interval, std::function<void()> task);
+    void Start(int interval_ms, std::function<void()> task);
+    void StartOnce(int interval_ms, std::function<void()> task);
     void Stop();
     bool isRunning();
 

@@ -12,7 +12,7 @@ TaskTimer::~TaskTimer()
     Stop();
 }
 
-void TaskTimer::Start(int interval, std::function<void()> task)
+void TaskTimer::Start(int interval_ms, std::function<void()> task)
 {
     // is started, do not start again
     if (_expired == false)
@@ -21,7 +21,7 @@ void TaskTimer::Start(int interval, std::function<void()> task)
     // start async timer, launch thread and wait in that thread
     _expired = false;
     _try_to_expire = false;
-    std::thread([this, interval, task]() {
+    std::thread([this, interval_ms, task]() {
         int count = 0;
         while (!_try_to_expire)
         {
@@ -31,7 +31,7 @@ void TaskTimer::Start(int interval, std::function<void()> task)
                 break;
             }
             ++count;
-            if (count >= interval / 100)
+            if (count >= interval_ms / 100)
             {
                 task();
                 count = 0;
@@ -48,7 +48,7 @@ void TaskTimer::Start(int interval, std::function<void()> task)
 
 }
 
-void TaskTimer::StartOnce(int interval, std::function<void()> task)
+void TaskTimer::StartOnce(int interval_ms, std::function<void()> task)
 {
     // is started, do not start again
     if (_expired == false)
@@ -57,7 +57,7 @@ void TaskTimer::StartOnce(int interval, std::function<void()> task)
     // start async timer, launch thread and wait in that thread
     _expired = false;
     _try_to_expire = false;
-    std::thread([this, interval, task]() {
+    std::thread([this, interval_ms, task]() {
         int count = 0;
         while (!_try_to_expire)
         {
@@ -67,7 +67,7 @@ void TaskTimer::StartOnce(int interval, std::function<void()> task)
                 break;
             }
             ++count;
-            if (count >= interval / 100)
+            if (count >= interval_ms / 100)
             {
                 task();
                 break;

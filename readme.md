@@ -1,18 +1,30 @@
-C++基础组件：
+## C++基础组件(跨平台)
 
-container：线程安全容器类
+### json类
 
-json：json处理相关
+​	json相关，json.h来自第三方库：https://github.com/nlohmann/json
 
-crypt：加密相关
+### crypt加密类
 
-timer：定时器
+​	sha256，base64， pkcs7
 
-utils：工具类
+### thread线程相关
 
-thread：线程相关，线程池，线程名称
+​	thread：参考webrtc写的线程类
 
-​     待完成：webrtc线程移植或者自己实现一套thread/hander机制
+​	ThreadPool：线程池类
+
+### timer定时器
+
+​	Timer：定时回调类
+
+​	TaskTimer：定时任务类
+
+### utils工具类
+
+​	strutil：字符串相关
+
+​	time_utils:时间相关
 
 
 
