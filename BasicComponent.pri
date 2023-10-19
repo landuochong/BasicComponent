@@ -11,6 +11,7 @@ HEADERS += \
     $$PWD/thread/thread.h \
     $$PWD/thread/thread_annotations.h \
     $$PWD/thread/thread_types.h \
+    $$PWD/timer/TaskTimer.h \
     $$PWD/timer/Timer.h \
     $$PWD/utils/strutil.h \
     $$PWD/utils/time_utils.h
@@ -23,6 +24,7 @@ SOURCES += \
     $$PWD/thread/task_queue_base.cc \
     $$PWD/thread/thread.cc \
     $$PWD/thread/thread_types.cc \
-    $$PWD/timer/Timer.cc \
+    $$PWD/timer/TaskTimer.cc \
+    $$PWD/timer/Timer.cpp \
     $$PWD/utils/strutil.cc \
     $$PWD/utils/time_utils.cc

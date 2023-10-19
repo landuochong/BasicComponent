@@ -1,18 +1,18 @@
-#include "timer.h"
+#include "TaskTimer.h"
 #include <thread>
 
-Timer::Timer()
+TaskTimer::TaskTimer()
     : _expired(true)
     , _try_to_expire(false)
 {
 }
 
-Timer::~Timer()
+TaskTimer::~TaskTimer()
 {
-    stop();
+    Stop();
 }
 
-void Timer::start(int interval, std::function<void()> task)
+void TaskTimer::Start(int interval, std::function<void()> task)
 {
     // is started, do not start again
     if (_expired == false)
@@ -27,6 +27,9 @@ void Timer::start(int interval, std::function<void()> task)
         {
             // sleep every interval and do the task again and again until times up
             std::this_thread::sleep_for(std::chrono::milliseconds(100));
+            if(_try_to_expire){
+                break;
+            }
             ++count;
             if (count >= interval / 100)
             {
@@ -45,7 +48,7 @@ void Timer::start(int interval, std::function<void()> task)
 
 }
 
-void Timer::startOnce(int interval, std::function<void()> task)
+void TaskTimer::StartOnce(int interval, std::function<void()> task)
 {
     // is started, do not start again
     if (_expired == false)
@@ -60,6 +63,9 @@ void Timer::startOnce(int interval, std::function<void()> task)
         {
             // sleep every interval and do the task again and again until times up
             std::this_thread::sleep_for(std::chrono::milliseconds(100));
+            if(_try_to_expire){
+                break;
+            }
             ++count;
             if (count >= interval / 100)
             {
@@ -77,7 +83,7 @@ void Timer::startOnce(int interval, std::function<void()> task)
     }).detach();
 }
 
-void Timer::stop()
+void TaskTimer::Stop()
 {
     // do not stop again
     if (_expired)
@@ -99,7 +105,7 @@ void Timer::stop()
 
 }
 
-bool Timer::isRunning()
+bool TaskTimer::isRunning()
 {
     return _expired == false;;
 }
