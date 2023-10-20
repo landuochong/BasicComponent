@@ -11,7 +11,7 @@ DEFINES += QT_DEPRECATED_WARNINGS
 DEFINES += WEBRTC_WIN
 
 #c++20
-CONFIG += c++17
+CONFIG += c++2a
 
 CONFIG+=force_debug_info
 CONFIG+=separate_debug_info
@@ -41,13 +41,13 @@ INCLUDEPATH += $$PWD/platform/windows
 include(BasicComponent.pri)
 
 
-contains(DEFINES, WIN64){
-    LIBS += -L$$PWD/third_party/openssl/openssl_lib_windows/x64/ -llibcrypto
-    LIBS += -L$$PWD/third_party/openssl/openssl_lib_windows/x64/ -llibssl
-}else{
-    LIBS += -L$$PWD/third_party/openssl/openssl_lib_windows/x86/ -llibcrypto
-    LIBS += -L$$PWD/third_party/openssl/openssl_lib_windows/x86/ -llibssl
-}
+#contains(DEFINES, WIN64){
+#    LIBS += -L$$PWD/third_party/openssl/openssl_lib_windows/x64/ -llibcrypto
+#    LIBS += -L$$PWD/third_party/openssl/openssl_lib_windows/x64/ -llibssl
+#}else{
+#    LIBS += -L$$PWD/third_party/openssl/openssl_lib_windows/x86/ -llibcrypto
+#    LIBS += -L$$PWD/third_party/openssl/openssl_lib_windows/x86/ -llibssl
+#}
 
 win32{
 LIBS +=-lkernel32

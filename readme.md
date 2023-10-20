@@ -26,7 +26,11 @@
 
 ​	time_utils:时间相关
 
+### 测试demo
 
+ 	app目录下测试代码 
+
+​         QT打开Test.pro即可编译运行
 
 
 
