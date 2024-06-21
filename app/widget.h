@@ -4,6 +4,7 @@
 #include <QWidget>
 #include <QString>
 #include <QDebug>
+#include <mutex>
 #include "thread.h"
 
 namespace Ui {
@@ -40,7 +41,7 @@ private:
     volatile bool start;
     std::mutex mux;
 
-    basic_comm::Thread thread;
+    basic_comm::Thread thread_;
 };
 
 #endif // WIDGET_H

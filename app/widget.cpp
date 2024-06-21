@@ -26,7 +26,7 @@ Widget::Widget(QWidget *parent) :
     ui(new Ui::Widget)
 {
     ui->setupUi(this);
-    thread.Start();
+    thread_.Start();
 }
 
 void blockingTask() {
@@ -38,22 +38,22 @@ void blockingTask() {
 void Widget::on_btn_send_clicked(){
     qDebug()<<"on_btn_send_clicked "<< QTime::currentTime().msec();;
 
-    thread.PostTask([&]{
+    thread_.PostTask([&]{
         std::this_thread::sleep_for(std::chrono::seconds(1));
         qDebug()<<"PostTask " << QTime::currentTime().toString("hh:mm:ss.zzz");
     });
 
-    thread.PostDelayedTask([&]{
+    thread_.PostDelayedTask([&]{
         qDebug()<<"DelayedTask " << QTime::currentTime().toString("hh:mm:ss.zzz");
     }, 3500000);
 
-    thread.PostDelayedTask([&]{
+    thread_.PostDelayedTask([&]{
         qDebug()<<"DelayedTask " << QTime::currentTime().toString("hh:mm:ss.zzz");
     }, 3'000'000);
 
-    std::thread([&]() {
+    std::thread([this]() {
         qDebug()<<"start BlockingCall"<< QTime::currentTime().toString("hh:mm:ss.zzz");
-        thread.BlockingCall([]{
+        thread_.BlockingCall([]{
             blockingTask();
         });
     }).detach();;

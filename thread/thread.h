@@ -172,6 +172,16 @@ class Thread : public TaskQueueBase {
   // DelayedMessage goes into a priority queue, sorted by trigger time. Messages
   // with the same trigger time are processed in num_ (FIFO) order.
   struct DelayedMessage {
+      DelayedMessage(){
+      }
+
+      DelayedMessage(int64_t delay_ms,int64_t run_time_ms,uint32_t message_number, absl::AnyInvocable<void() &&> functor){
+          this->delay_ms = delay_ms;
+          this->run_time_ms = run_time_ms;
+          this->message_number = message_number;
+          this->functor = std::move(functor);
+      }
+
     bool operator<(const DelayedMessage& dmsg) const {
       return (dmsg.run_time_ms < run_time_ms) ||
              ((dmsg.run_time_ms == run_time_ms) &&
