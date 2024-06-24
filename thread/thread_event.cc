@@ -8,7 +8,7 @@
  *  be found in the AUTHORS file in the root of the source tree.
  */
 
-#include "event.h"
+#include "thread_event.h"
 
 #if defined(WEBRTC_WIN)
 #include <windows.h>
@@ -25,11 +25,11 @@
 
 namespace basic_comm {
 
-Event::Event() : Event(false, false) {}
+ThreadEvent::ThreadEvent() : ThreadEvent(false, false) {}
 
 #if defined(WEBRTC_WIN)
 
-Event::Event(bool manual_reset, bool initially_signaled) {
+ThreadEvent::ThreadEvent(bool manual_reset, bool initially_signaled) {
   event_handle_ = ::CreateEvent(nullptr,  // Security attributes.
                                 manual_reset, initially_signaled,
                                 nullptr);  // Name.
@@ -39,20 +39,20 @@ Event::Event(bool manual_reset, bool initially_signaled) {
   }
 }
 
-Event::~Event() {
+ThreadEvent::~ThreadEvent() {
   CloseHandle(event_handle_);
 }
 
-void Event::Set() {
+void ThreadEvent::Set() {
   SetEvent(event_handle_);
 }
 
-void Event::Reset() {
+void ThreadEvent::Reset() {
   ResetEvent(event_handle_);
 }
 
 
-bool Event::Wait(int64_t give_up_after, int64_t /*warn_after*/) {
+bool ThreadEvent::Wait(int64_t give_up_after, int64_t /*warn_after*/) {
   const DWORD ms =
       give_up_after == kForever
           ? INFINITE

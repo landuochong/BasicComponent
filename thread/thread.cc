@@ -163,8 +163,8 @@ absl::AnyInvocable<void() &&> Thread::Get(int cmsWait) {
 
     {
       // Wait and multiplex in the meantime
-        event_.Wait(cmsNext == kForever ? Event::kForever
-                                         : cmsNext*1000,Event::kForever);
+        event_.Wait(cmsNext == kForever ? ThreadEvent::kForever
+                                         : cmsNext*1000,ThreadEvent::kForever);
     }
 
     // If the specified timeout expired, return
@@ -388,15 +388,15 @@ void Thread::BlockingCall(FunctionView<void()> functor) {
 
   // Perhaps down the line we can get rid of this workaround and always require
   // current_thread to be valid when BlockingCall() is called.
-  std::unique_ptr<Event> done_event;
-  done_event.reset(new Event());
+  std::unique_ptr<ThreadEvent> done_event;
+  done_event.reset(new ThreadEvent());
 
   absl::Cleanup cleanup = [this, done = done_event.get()] {
       done->Set();
   };
   //添加任务
   PostTask([functor, cleanup = std::move(cleanup)] { functor(); });
-  done_event->Wait(Event::kForever);
+  done_event->Wait(ThreadEvent::kForever);
 }
 
 // Called by the ThreadManager when being set as the current thread.

@@ -20,6 +20,47 @@
 
 ​	TaskTimer：定时任务类
 
+### 事件总线：**EventBus**
+
+Handler和Event是相对应的
+
+```c++
+class CustomEvent : public Event
+{
+public:
+  CustomEvent() :
+};
+
+class CustomListener : public EventHandler<CustomEvent>
+{
+public:
+  virtual void onEvent(CustomEvent & e) override {
+    //处理事件
+  }
+};
+
+class CustomListener2 : public EventHandler<CustomEvent>
+{
+public:
+  virtual void onEvent(CustomEvent & e) override {
+    //处理事件
+  }
+};
+
+CustomListener listener;
+//添加针对事件CustomEvent的handler
+EventBus::AddHandler<CustomEvent>(&pListener);
+//支持多个Listener
+CustomListener2 listener2;
+EventBus::AddHandler<CustomEvent>(&pListener2);
+
+//移除handler
+EventBus::RemoveHandler<CustomEvent>(&pListener);
+EventBus::RemoveHandler<CustomEvent>(&pListener2);
+```
+
+
+
 ### utils工具类
 
 ​	strutil：字符串相关

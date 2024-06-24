@@ -7,7 +7,7 @@
 QT       += core gui network
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
-TARGET = Test
+TARGET = BasicComponentTest
 TEMPLATE = app
 
 DESTDIR = $$PWD/../../build

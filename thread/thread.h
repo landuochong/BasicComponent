@@ -23,7 +23,7 @@
 #include <utility>
 #include <vector>
 
-#include "event.h"
+#include "thread_event.h"
 #if defined(WEBRTC_POSIX)
 #include <pthread.h>
 #endif
@@ -246,7 +246,7 @@ class Thread : public TaskQueueBase {
   bool fInitialized_;
   bool fDestroyed_;
 
-  Event event_;
+  ThreadEvent event_;
 
   std::atomic<int> stop_;
   std::string name_;

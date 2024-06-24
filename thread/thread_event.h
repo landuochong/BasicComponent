@@ -33,16 +33,16 @@ class RTC_SCOPED_LOCKABLE MutexLock final {
   absl::Mutex* mutex_;
 };
 
-class Event {
+class ThreadEvent {
  public:
   // TODO(bugs.webrtc.org/14366): Consider removing this redundant alias.
   static constexpr int64_t kForever = std::numeric_limits<int64_t>::max();
 
-  Event();
-  Event(bool manual_reset, bool initially_signaled);
-  Event(const Event&) = delete;
-  Event& operator=(const Event&) = delete;
-  ~Event();
+  ThreadEvent();
+  ThreadEvent(bool manual_reset, bool initially_signaled);
+  ThreadEvent(const ThreadEvent&) = delete;
+  ThreadEvent& operator=(const ThreadEvent&) = delete;
+  ~ThreadEvent();
 
   void Set();
   void Reset();
