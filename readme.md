@@ -43,7 +43,7 @@ class CustomListener2 : public EventHandler<CustomEvent>
 {
 public:
   virtual void onEvent(CustomEvent & e) override {
-    //处理事件
+    //处理事件,不要做耗时操作，最好在子线程处理，因为是引用，切换线程可能需要copy。
   }
 };
 
@@ -57,6 +57,10 @@ EventBus::AddHandler<CustomEvent>(&pListener2);
 //移除handler
 EventBus::RemoveHandler<CustomEvent>(&pListener);
 EventBus::RemoveHandler<CustomEvent>(&pListener2);
+
+//发送事件
+CustomEvent event;
+EventBus::SendEvent(event);
 ```
 
 

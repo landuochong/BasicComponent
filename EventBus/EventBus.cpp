@@ -44,6 +44,7 @@ void EventBus::RemoveHandler(std::type_index type_id, void * const handler){
 }
 
 void EventBus::SendEvent(std::type_index type_id, Event& e){
+    //最好在子线程处理
     std::unique_lock<std::mutex> locker(_mutex);
     Registrations* registrations = handlers[type_id];
     if (registrations == nullptr) {
