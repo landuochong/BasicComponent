@@ -87,9 +87,13 @@ EventBus::SendEvent(event);
 
 ### 第三方：
 
-```
+```wiki
 abseil-cpp：
 https://github.com/abseil/abseil-cpp.git@c8a2f92586fe9b4e1aff049108f5db8064924d8e
+
+sigslot:
+https://sigslot.sourceforge.net/
+
 
 ```
 

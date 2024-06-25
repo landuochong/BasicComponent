@@ -8,6 +8,7 @@ DESTDIR = $$PWD/../build
 
 DEFINES += QT_DEPRECATED_WARNINGS
 
+#支持win
 DEFINES += WEBRTC_WIN
 
 #c++20
@@ -37,6 +38,7 @@ INCLUDEPATH += $$PWD/EventBus
 
 INCLUDEPATH += $$PWD/third_party/openssl/include
 INCLUDEPATH += $$PWD/third_party/abseil-cpp/
+INCLUDEPATH += $$PWD/third_party/sigslot/
 INCLUDEPATH += $$PWD/platform/windows
 
 include(BasicComponent.pri)

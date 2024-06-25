@@ -7,6 +7,7 @@ HEADERS += \
     $$PWD/crypt/pkcs7_padding.h \
     $$PWD/json/DataParseUtil.h \
     $$PWD/json/json.h \
+    $$PWD/third_party/sigslot/sigslot.h \
     $$PWD/thread/ThreadPool.h \
     $$PWD/thread/function_view.h \
     $$PWD/thread/task_queue_base.h \
@@ -24,6 +25,7 @@ SOURCES += \
     $$PWD/crypt/ibase64.cc \
     $$PWD/crypt/pkcs7_padding.c \
     $$PWD/json/DataParseUtil.cc \
+    $$PWD/third_party/sigslot/sigslot.cc \
     $$PWD/thread/task_queue_base.cc \
     $$PWD/thread/thread.cc \
     $$PWD/thread/thread_event.cc \
