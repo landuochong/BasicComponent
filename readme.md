@@ -85,11 +85,25 @@ EventBus::SendEvent(event);
 
 依赖库：加密依赖OpenSSL
 
+### 第三方：
+
+```
+abseil-cpp：
+https://github.com/abseil/abseil-cpp.git@c8a2f92586fe9b4e1aff049108f5db8064924d8e
+
+```
+
+
+
 下载代码：
 
-1.下载.gclient和.gclient_entries，放到目录下
+创建BasicComponent目录
 
-2.执行gclient sync
+1.复制doc目录下的 .gclient和.gclient_entries，放到目录下
+
+2.执行gclient sync，会下载项目源码和第三方依赖
+
+3.src下的代码就是我们的项目代码
 
 
 
