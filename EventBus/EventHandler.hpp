@@ -2,10 +2,12 @@
 #define EVENT_HANDLER_HPP_
 #include <typeinfo>
 #include <type_traits>
+#include <typeindex>
 
 namespace basic_comm_eventbus {
 class Event;
-template <class T>
+
+template <class T, typename std::enable_if<std::is_base_of<Event, T>::value, T>::type* = nullptr>
 class EventHandler {
 public:
 	EventHandler() {
@@ -18,7 +20,7 @@ public:
 
     //事件分发
 	void dispatch(Event & e) {
-		onEvent(dynamic_cast<T &>(e));
+        onEvent(dynamic_cast<T &>(e));
 	}
 };
 }

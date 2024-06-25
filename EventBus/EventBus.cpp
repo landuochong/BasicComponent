@@ -1,43 +1,29 @@
 #include "EventBus.hpp"
+#include<QDebug>
 namespace basic_comm_eventbus {
-
-template <class T>
-void EventBus::AddHandler(EventHandler<T>* handler) {
-     GetInstance()->AddHandler(typeid(T), static_cast<void*>(&handler));
-}
-
-template <class T>
-void const EventBus::RemoveHandler(EventHandler<T>* handler) {
-    GetInstance()->RemoveHandler(typeid(T), static_cast<void*>(&handler));
-}
-
-void EventBus::SendEvent(Event & e) {
-    GetInstance()->SendEvent(typeid(e), e);
-}
-
 
 void EventBus::AddHandler(std::type_index type_id, void * const handler){
     std::unique_lock<std::mutex> locker(_mutex);
-    Registrations* registrations = handlers[type_id];
+    Registrations* holders = handlers[type_id];
     //创建列表
-    if (registrations == nullptr) {
-        registrations = new Registrations();
-        handlers[type_id] = registrations;
+    if (holders == nullptr) {
+        holders = new Registrations();
+        handlers[type_id] = holders;
     }
 
-    EventHolder* registration = new EventHolder(handler);
-    registrations->push_back(registration);
+    EventHolder* holder = new EventHolder(handler);
+    holders->push_back(holder);
 }
 
 void EventBus::RemoveHandler(std::type_index type_id, void * const handler){
     std::unique_lock<std::mutex> locker(_mutex);
-    Registrations* registrations = handlers[type_id];
-    if (registrations == nullptr) {
+    Registrations* holders = handlers[type_id];
+    if (holders == nullptr) {
         return;
     }
-    for(EventHolder* item: *registrations){
+    for(EventHolder* item: *holders){
         if(item->getHandler() == handler){
-            registrations->remove(item);
+            holders->remove(item);
             break;
         }
     }
@@ -46,13 +32,16 @@ void EventBus::RemoveHandler(std::type_index type_id, void * const handler){
 void EventBus::SendEvent(std::type_index type_id, Event& e){
     //最好在子线程处理
     std::unique_lock<std::mutex> locker(_mutex);
-    Registrations* registrations = handlers[type_id];
-    if (registrations == nullptr) {
+    Registrations* holders = handlers[type_id];
+    if (holders == nullptr) {
         return;
     }
 
-    for (auto & reg : *registrations) {
-        static_cast<EventHandler<Event>*>(reg->getHandler())->dispatch(e);
+    for (auto & holder : *holders) {
+        EventHandler<Event>* handler = static_cast<EventHandler<Event>*>(holder->getHandler());
+        if(handler){
+            handler->dispatch(e);
+        }
     }
 }
 

@@ -18,7 +18,7 @@
 #include <QDateTime>
 #include <QTextCodec>
 #include <QDir>
-
+#include "EventBus/EventBus.hpp"
 using namespace std;
 
 Widget::Widget(QWidget *parent) :
@@ -27,6 +27,12 @@ Widget::Widget(QWidget *parent) :
 {
     ui->setupUi(this);
     thread_.Start();
+
+    basic_comm_eventbus::EventBus::AddHandler<CustomEvent>(this);
+}
+
+Widget::~Widget(){
+    basic_comm_eventbus::EventBus::RemoveHandler<CustomEvent>(this);
 }
 
 void blockingTask() {
@@ -35,7 +41,7 @@ void blockingTask() {
 }
 
 
-void Widget::on_btn_send_clicked(){
+void Widget::on_btn_thread_test_clicked(){
     qDebug()<<"on_btn_send_clicked "<< QTime::currentTime().msec();;
 
     thread_.PostTask([&]{
@@ -56,12 +62,12 @@ void Widget::on_btn_send_clicked(){
         thread_.BlockingCall([]{
             blockingTask();
         });
-    }).detach();;
-
+    }).detach();
 }
 
-void Widget::on_btn_update_clicked(){
-
+void Widget::on_btn_eventbus_clicked(){
+    CustomEvent event("Send Custom Event");
+    basic_comm_eventbus::EventBus::SendEvent(event);
 }
 
 void Widget::on_btn_net_clicked(){
@@ -78,4 +84,8 @@ void Widget::on_btn_connect_clicked(){
 
 void Widget::test(int value){
     qDebug()<<"pool end id:"<<value;
+}
+
+void Widget::onEvent(CustomEvent& e){
+    qDebug()<<e.GetMsg().c_str();
 }

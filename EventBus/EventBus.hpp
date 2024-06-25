@@ -14,20 +14,25 @@ public:
      * 注册handler
 	 * @param handler The event handler class
 	 */
-	template <class T>
-    static void AddHandler(EventHandler<T>* handler);
+    template <class T, typename std::enable_if<std::is_base_of<Event, T>::value, T>::type* = nullptr>
+    static void AddHandler(EventHandler<T>* handler) {
+         GetInstance()->AddHandler(typeid(T), static_cast<void*>(handler));
+    }
 
-	template <class T>
-    static void const RemoveHandler(EventHandler<T>* handler);
+    template <class T, typename std::enable_if<std::is_base_of<Event, T>::value, T>::type* = nullptr>
+    static void const RemoveHandler(EventHandler<T>* handler) {
+        GetInstance()->RemoveHandler(typeid(T), reinterpret_cast<void*>(handler));
+    }
 
-	static void SendEvent(Event & e);
+    static void SendEvent(Event & e){
+        GetInstance()->SendEvent(typeid(e), e);
+    }
 
 public:
     virtual ~EventBus() { }
 
 private:
     EventBus() {}
-
 	static EventBus* const GetInstance() {
         static EventBus instance;
         return &instance;
@@ -64,4 +69,4 @@ private:
 };
 
 }
-#endif /* _SRC_EVENT_EVENT_BUS_HPP_ */
+#endif /* EVENT_BUS_HPP_ */

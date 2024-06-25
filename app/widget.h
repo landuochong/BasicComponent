@@ -6,6 +6,8 @@
 #include <QDebug>
 #include <mutex>
 #include "thread.h"
+#include "EventBus/EventHandler.hpp"
+#include "EventBus/Event.hpp"
 
 namespace Ui {
 class Widget;
@@ -13,15 +15,41 @@ class Widget;
 
 class ThreadPool;
 
-class Widget : public QWidget
+class CustomEvent : public basic_comm_eventbus::Event
+{
+public:
+    CustomEvent(std::string msg){
+        this->msg = msg;
+    }
+
+    std::string GetMsg(){
+        return msg;
+    }
+
+private:
+    std::string msg;
+};
+
+class CustomListener : public basic_comm_eventbus::EventHandler<CustomEvent>
+{
+public:
+  virtual void onEvent(CustomEvent& e) override {
+    //处理事件
+
+  }
+};
+
+
+class Widget : public QWidget, public basic_comm_eventbus::EventHandler<CustomEvent>
 {
     Q_OBJECT
 public:
     explicit Widget(QWidget *parent = nullptr);
+    ~Widget();
 
 private slots:
-  void on_btn_send_clicked();
-  void on_btn_update_clicked();
+  void on_btn_thread_test_clicked();
+  void on_btn_eventbus_clicked();
 
   void on_btn_net_clicked();
   void on_btn_media_clicked();
@@ -32,6 +60,8 @@ private:
  Widget& operator=(const Widget&);
 
  void test(int value);
+
+ virtual void onEvent(CustomEvent& e)override;
 
 signals:
   void sig_send(int);
