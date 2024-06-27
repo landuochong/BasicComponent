@@ -7,6 +7,11 @@ HEADERS += \
     $$PWD/crypt/pkcs7_padding.h \
     $$PWD/json/DataParseUtil.h \
     $$PWD/json/json.h \
+    $$PWD/third_party/mio/mmap.hpp \
+    $$PWD/third_party/mio/mmap.ipp \
+    $$PWD/third_party/mio/mmap_util.h \
+    $$PWD/third_party/mio/page.hpp \
+    $$PWD/third_party/mio/path.hpp \
     $$PWD/third_party/sigslot/sigslot.h \
     $$PWD/thread/ThreadPool.h \
     $$PWD/thread/function_view.h \
@@ -25,6 +30,7 @@ SOURCES += \
     $$PWD/crypt/ibase64.cc \
     $$PWD/crypt/pkcs7_padding.c \
     $$PWD/json/DataParseUtil.cc \
+    $$PWD/third_party/mio/mmap_util.cc \
     $$PWD/third_party/sigslot/sigslot.cc \
     $$PWD/thread/task_queue_base.cc \
     $$PWD/thread/thread.cc \

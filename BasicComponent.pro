@@ -36,6 +36,7 @@ INCLUDEPATH += $$PWD/timer
 INCLUDEPATH += $$PWD/utils
 INCLUDEPATH += $$PWD/EventBus
 
+INCLUDEPATH += $$PWD/third_party/
 INCLUDEPATH += $$PWD/third_party/openssl/include
 INCLUDEPATH += $$PWD/third_party/abseil-cpp/
 INCLUDEPATH += $$PWD/third_party/sigslot/
