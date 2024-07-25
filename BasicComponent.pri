@@ -15,6 +15,7 @@ HEADERS += \
     $$PWD/third_party/sigslot/sigslot.h \
     $$PWD/thread/ThreadPool.h \
     $$PWD/thread/function_view.h \
+    $$PWD/thread/pending_task_safety_flag.h \
     $$PWD/thread/task_queue_base.h \
     $$PWD/thread/thread.h \
     $$PWD/thread/thread_annotations.h \
@@ -32,6 +33,7 @@ SOURCES += \
     $$PWD/json/DataParseUtil.cc \
     $$PWD/third_party/mio/mmap_util.cc \
     $$PWD/third_party/sigslot/sigslot.cc \
+    $$PWD/thread/pending_task_safety_flag.cc \
     $$PWD/thread/task_queue_base.cc \
     $$PWD/thread/thread.cc \
     $$PWD/thread/thread_event.cc \
