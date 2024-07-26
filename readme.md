@@ -10,15 +10,21 @@
 
 ### thread线程相关
 
-​	thread：参考webrtc写的线程类
+​	thread：参考webrtc写的线程类， 
+
+​        SafeTask和PendingTaskSafetyFlag：用于同一线程的任务控制
 
 ​	ThreadPool：线程池类
 
-### timer定时器
+### Timer定时器
 
 ​	Timer：定时回调类
 
 ​	TaskTimer：定时任务类
+
+### protobuf
+
+
 
 ### 事件总线：**EventBus**
 
